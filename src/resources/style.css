@@ -1,0 +1,30 @@
+@font-face {
+    font-family: 'Sriracha';
+    src: url('fonts/Sriracha-Regular.ttf');
+}
+#wholeWin{
+    -fx-border-color: #4f4f4f;
+    -fx-border-width: 2;
+}
+#root{
+    -fx-background-image: url("background.jpg");
+    -fx-background-size: stretch;
+    -fx-background-position: center center;
+    -fx-padding: 10 0 0 0;
+}
+#dragBar{
+    -fx-background-color: #3e3e3e;
+}
+#closeWin, #minWin, #settWin, #backBtn, .menuBtn{
+    -fx-cursor: hand;
+}
+#menuTabs{
+    -fx-border-width: 0;
+    -fx-border-color: transparent;
+}
+.menuBtn {
+    -fx-font-family: "Sriracha";
+    -fx-text-fill: #f1f1f1;
+    -fx-background-color: rgba(0,0,0,.3);
+    -fx-font-size: 20;
+}
