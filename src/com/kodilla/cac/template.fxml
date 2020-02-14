@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import org.controlsfx.glyphfont.*?>
 
-<Pane id="wholeWin" maxHeight="1000" maxWidth="1500" minHeight="250" minWidth="375" prefHeight="500" prefWidth="750" stylesheets="@../../../resources/style.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
+<Pane id="wholeWin" maxHeight="1000" maxWidth="1500" minHeight="250" minWidth="375" prefHeight="500" prefWidth="750" stylesheets="@../../../resources/style.css" xmlns="http://javafx.com/javafx/10.0.2-internal">
     <Pane id="dragBar" prefHeight="30" prefWidth="750">
         <HBox layoutX="615" prefHeight="30" prefWidth="135">
             <BorderPane id="settWin" prefHeight="30" prefWidth="45">
@@ -25,5 +23,4 @@
             </BorderPane>
         </HBox>
     </Pane>
-   <GridPane id="root" alignment="TOP_CENTER" layoutY="30" minHeight="250" minWidth="375" prefHeight="470" prefWidth="750" vgap="10" />
 </Pane>

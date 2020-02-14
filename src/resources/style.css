@@ -5,15 +5,30 @@
 #wholeWin{
     -fx-border-color: #4f4f4f;
     -fx-border-width: 2;
+    -fx-pref-width: 750;
+    -fx-pref-height: 500;
+}
+#gameBoard{
+    -fx-background-image: url("background.jpg");
+    -fx-background-size: stretch;
+    -fx-background-position: center center;
+    -fx-pref-height: 470;
+    -fx-pref-width: 750;
 }
 #root{
     -fx-background-image: url("background.jpg");
     -fx-background-size: stretch;
     -fx-background-position: center center;
     -fx-padding: 10 0 0 0;
+    -fx-alignment: top-center;
+    -fx-pref-height: 470;
+    -fx-pref-width: 750;
+    -fx-vgap: 10;
 }
 #dragBar{
     -fx-background-color: #3e3e3e;
+    -fx-pref-height: 30;
+    -fx-pref-width: 750;
 }
 #closeWin, #minWin, #settWin, #backBtn, .menuBtn{
     -fx-cursor: hand;
@@ -27,7 +42,6 @@
     -fx-pref-width: 45;
     -fx-cursor: hand;
 }
-
 .glyphStyle{
     -fx-font-family: "FontAwesome";
     -fx-text-fill: #fff;
@@ -51,4 +65,54 @@
     -fx-font-size: 20;
     -fx-pref-width: 90;
     -fx-pref-height: 45;
+}
+.taskBtn{
+    -fx-pref-height: 30;
+    -fx-pref-width: 45;
+}
+#taskOptions{
+    -fx-pref-width: 135;
+    -fx-pref-height: 30;
+}
+.tttPane{
+    -fx-pref-height: 140;
+    -fx-pref-width: 140;
+    -fx-border-color: #ae9b95;
+    -fx-cursor: hand;
+}
+.tttPane:hover{
+    -fx-background-color: rgba(0,0,0,.2);
+}
+.border-right-bottom{
+    -fx-border-width: 0 2 2 0;
+}
+.border-bottom{
+    -fx-border-width: 0 0 2 0;
+}
+.border-left-bottom{
+    -fx-border-width: 0 0 2 2;
+}
+.border-right{
+    -fx-border-width: 0 2 0 0;
+}
+.border-none{
+    -fx-border-width: 0;
+}
+.border-left{
+    -fx-border-width: 0 0 0 2;
+}
+.border-left-top{
+    -fx-border-width: 2 0 0 2;
+}
+.border-right-top{
+    -fx-border-width: 2 2 0 0;
+}
+.border-top{
+    -fx-border-width: 2 0 0 0;
+}
+.leftBar{
+    -fx-pref-height: 470;
+    -fx-pref-width: 150;
+    -fx-background-color: rgba(0,0,0,0.2);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,.2), 1, 10.0, 1, 0)
 }

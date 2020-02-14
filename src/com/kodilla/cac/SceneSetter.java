@@ -3,6 +3,7 @@ package com.kodilla.cac;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -24,11 +25,13 @@ public class SceneSetter {
     private String hoverCloseBtnColor = "#00000040";
     private String hoverReturnBtnColor = "#00000060";
     private String temFileName = "template.fxml";
+    private String temFileName2 = "soloplayer.fxml";
     private String dragIdName = "#dragBar";
     private String minIdName = "#minWin";
     private String closeIdName = "#closeWin";
     private String settIdName = "#settWin";
-    private String rootIdName = "#root";
+    private String rootIdName = "#wholeWin";
+    private String rootBackIdName = "root";
     private String backIcon = "long_arrow_left";
     private String sceneMissing = "Brak sceny o danym numerze";
     private String buttonClassName = "menuBtn";
@@ -55,6 +58,9 @@ public class SceneSetter {
             case 1:
                 tScene = menuScene(primaryStage);
                 break;
+            case 2:
+                tScene = gameScene(primaryStage);
+                break;
             default:
                 System.out.println(sceneMissing);
                 break;
@@ -70,6 +76,37 @@ public class SceneSetter {
         Pane backBtn = new Pane();
         backBtn.getStyleClass().add(backButtonClassName);
         backBtn.setOnMouseEntered(event1 -> backBtn.setBackground(new Background(new BackgroundFill(Color.web(hoverBtnColor), CornerRadii.EMPTY, Insets.EMPTY)))); //do stałych
+        backBtn.setOnMouseExited(event1 -> backBtn.setBackground(Background.EMPTY));
+        backBtn.setOnMouseClicked(event -> {
+            try {
+                primaryStage.setScene(this.SceneSet(1, primaryStage));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        Glyph backArrow = new Glyph();
+        backArrow.getStyleClass().add(glyphStyleClassName);
+        backArrow.setIcon(backIcon);
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setId(backBackButtonIdName);
+        borderPane.setCenter(backArrow);
+
+        backBtn.getChildren().add(borderPane);
+        dragBar.getChildren().add(backBtn);
+
+        return new Scene(template, 750, 500);
+    }
+
+    public Scene gameScene(Stage primaryStage) throws IOException {
+        Parent template = FXMLLoader.load(getClass().getResource(temFileName2));
+        Pane dragBar = (Pane) template.lookup(dragIdName);
+        defFunctions(primaryStage, true, template);
+
+        Pane backBtn = new Pane();
+        backBtn.getStyleClass().add(backButtonClassName);
+        backBtn.setOnMouseEntered(event1 -> backBtn.setBackground(new Background(new BackgroundFill(Color.web(hoverBtnColor), CornerRadii.EMPTY, Insets.EMPTY))));
         backBtn.setOnMouseExited(event1 -> backBtn.setBackground(Background.EMPTY));
         backBtn.setOnMouseClicked(event -> {
             try {
@@ -145,7 +182,11 @@ public class SceneSetter {
 
     public Scene menuScene(Stage primaryStage)  throws IOException {
         Parent template = FXMLLoader.load(getClass().getResource(temFileName));
-        GridPane gridPane = (GridPane) template.lookup(rootIdName);
+        Pane whole = (Pane) template.lookup(rootIdName);
+        GridPane gridPane = new GridPane();
+        gridPane.setId(rootBackIdName);
+        gridPane.setLayoutY(30);
+        gridPane.setAlignment(Pos.TOP_CENTER);
         defFunctions(primaryStage, false, template);
         ImageView logo = new ImageView();
         logo.setId(logoIdName);
@@ -175,12 +216,19 @@ public class SceneSetter {
 
             butt.setOnMouseEntered(event -> butt.setBackground(new Background(new BackgroundFill(Color.web(hoverReturnBtnColor), CornerRadii.EMPTY, Insets.EMPTY))));
             butt.setOnMouseExited(event -> butt.setBackground(new Background(new BackgroundFill(Color.web(hoverBtnColor), CornerRadii.EMPTY, Insets.EMPTY))));
-            butt.setOnMouseClicked(event -> System.out.println(sceneMissing + btn.getValue()));
+            butt.setOnMouseClicked(event -> {
+                try {
+                    primaryStage.setScene(this.SceneSet(btn.getValue(), primaryStage));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
         }
 
         gridPane.add(logo, 0,0);
         gridPane.add(options, 0, 1);
+        whole.getChildren().add(gridPane);
 
         return new Scene(template, 750, 500);
     }
