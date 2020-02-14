@@ -21,27 +21,16 @@ public class SceneSetter {
     private double xOffset = 0;
     private double yOffset = 0;
 
-    private String hoverBtnColor = "#00000040";
-    private String hoverCloseBtnColor = "#00000040";
-    private String hoverReturnBtnColor = "#00000060";
-    private String temFileName = "template.fxml";
-    private String temFileName2 = "soloplayer.fxml";
-    private String dragIdName = "#dragBar";
-    private String minIdName = "#minWin";
-    private String closeIdName = "#closeWin";
-    private String settIdName = "#settWin";
-    private String rootIdName = "#wholeWin";
-    private String rootBackIdName = "root";
-    private String backIcon = "long_arrow_left";
-    private String sceneMissing = "Brak sceny o danym numerze";
-    private String buttonClassName = "menuBtn";
-    private String textColor = "#f1f1f1";
-    private String backButtonClassName = "backBtn";
-    private String glyphStyleClassName = "glyphStyle";
-    private String backBackButtonIdName = "backBackButton";
-    private String buttonsIdName = "buttonsBlock";
-    private String logoIdName = "logoView";
-    private List<String> btnContent = new LinkedList<String>() {
+    private final String hoverBtnColor = "#00000040";
+    private final String hoverCloseBtnColor = "#00000040";
+    private final String hoverReturnBtnColor = "#00000060";
+    private final String temFileName = "template.fxml";
+    private final String dragIdName = "#dragBar";
+    private final String backIcon = "long_arrow_left";
+    private final String backButtonClassName = "backBtn";
+    private final String glyphStyleClassName = "glyphStyle";
+    private final String backBackButtonIdName = "backBackButton";
+    private final List<String> btnContent = new LinkedList<String>() {
         {
             add("Jednoosobowa");
             add("Wieloosobowa");
@@ -51,6 +40,7 @@ public class SceneSetter {
 
     public Scene SceneSet(int sceneNr, Stage primaryStage) throws IOException {
         Scene tScene = null;
+        String sceneMissing = "Brak sceny o danym numerze";
         switch (sceneNr) {
             case 0:
                 tScene = settingsScene(primaryStage);
@@ -75,7 +65,7 @@ public class SceneSetter {
 
         Pane backBtn = new Pane();
         backBtn.getStyleClass().add(backButtonClassName);
-        backBtn.setOnMouseEntered(event1 -> backBtn.setBackground(new Background(new BackgroundFill(Color.web(hoverBtnColor), CornerRadii.EMPTY, Insets.EMPTY)))); //do stałych
+        backBtn.setOnMouseEntered(event1 -> backBtn.setBackground(new Background(new BackgroundFill(Color.web(hoverBtnColor), CornerRadii.EMPTY, Insets.EMPTY))));
         backBtn.setOnMouseExited(event1 -> backBtn.setBackground(Background.EMPTY));
         backBtn.setOnMouseClicked(event -> {
             try {
@@ -100,6 +90,7 @@ public class SceneSetter {
     }
 
     public Scene gameScene(Stage primaryStage) throws IOException {
+        String temFileName2 = "soloplayer.fxml";
         Parent template = FXMLLoader.load(getClass().getResource(temFileName2));
         Pane dragBar = (Pane) template.lookup(dragIdName);
         defFunctions(primaryStage, true, template);
@@ -131,8 +122,11 @@ public class SceneSetter {
     }
 
     public void defFunctions(Stage primaryStage, boolean setting, Parent template){
+        String closeIdName = "#closeWin";
         Pane closeBtn = (Pane) template.lookup(closeIdName);
+        String minIdName = "#minWin";
         Pane minWin = (Pane) template.lookup(minIdName);
+        String settIdName = "#settWin";
         Pane settWin = (Pane) template.lookup(settIdName);
         Pane dBar = (Pane) template.lookup(dragIdName);
 
@@ -182,13 +176,16 @@ public class SceneSetter {
 
     public Scene menuScene(Stage primaryStage)  throws IOException {
         Parent template = FXMLLoader.load(getClass().getResource(temFileName));
+        String rootIdName = "#wholeWin";
         Pane whole = (Pane) template.lookup(rootIdName);
         GridPane gridPane = new GridPane();
+        String rootBackIdName = "root";
         gridPane.setId(rootBackIdName);
         gridPane.setLayoutY(30);
         gridPane.setAlignment(Pos.TOP_CENTER);
         defFunctions(primaryStage, false, template);
         ImageView logo = new ImageView();
+        String logoIdName = "logoView";
         logo.setId(logoIdName);
         logo.setFitWidth(415);
         logo.setFitHeight(190);
@@ -196,6 +193,7 @@ public class SceneSetter {
         logo.setPreserveRatio(true);
 
         VBox options = new VBox();
+        String buttonsIdName = "buttonsBlock";
         options.setId(buttonsIdName);
 
         Map<String, Integer> buttonMap = new LinkedHashMap<>();
@@ -206,10 +204,12 @@ public class SceneSetter {
         for (Map.Entry<String, Integer> btn : buttonMap.entrySet()){
 
             BorderPane butt = new BorderPane();
+            String buttonClassName = "menuBtn";
             butt.getStyleClass().add(buttonClassName);
 
             Text txt = new Text();
             txt.setText(btn.getKey());
+            String textColor = "#f1f1f1";
             txt.setFill(Color.web(textColor));
             butt.setCenter(txt);
             options.getChildren().add(butt);
