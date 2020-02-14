@@ -22,9 +22,33 @@
     -fx-border-width: 0;
     -fx-border-color: transparent;
 }
-.menuBtn {
+.backBtn{
+    -fx-pref-height: 30;
+    -fx-pref-width: 45;
+    -fx-cursor: hand;
+}
+
+.glyphStyle{
+    -fx-font-family: "FontAwesome";
+    -fx-text-fill: #fff;
+}
+#backBackButton{
+    -fx-pref-height: 30;
+    -fx-pref-width: 45;
+}
+#logoView{
+    -fx-image: url("logoIn.png");
+}
+#buttonsBlock{
+    -fx-spacing: 5;
+    -fx-pref-width: 100;
+    -fx-pref-height: 200;
+}
+.menuBtn{
     -fx-font-family: "Sriracha";
     -fx-text-fill: #f1f1f1;
     -fx-background-color: rgba(0,0,0,.3);
     -fx-font-size: 20;
+    -fx-pref-width: 90;
+    -fx-pref-height: 45;
 }

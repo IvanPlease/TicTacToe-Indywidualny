@@ -3,10 +3,8 @@ package com.kodilla.cac;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
-import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -14,16 +12,39 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.controlsfx.glyphfont.Glyph;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SceneSetter {
 
     private double xOffset = 0;
     private double yOffset = 0;
+
+    private String hoverBtnColor = "#00000040";
+    private String hoverCloseBtnColor = "#00000040";
+    private String hoverReturnBtnColor = "#00000060";
+    private String temFileName = "template.fxml";
+    private String dragIdName = "#dragBar";
+    private String minIdName = "#minWin";
+    private String closeIdName = "#closeWin";
+    private String settIdName = "#settWin";
+    private String rootIdName = "#root";
+    private String backIcon = "long_arrow_left";
+    private String sceneMissing = "Brak sceny o danym numerze";
+    private String buttonClassName = "menuBtn";
+    private String textColor = "#f1f1f1";
+    private String backButtonClassName = "backBtn";
+    private String glyphStyleClassName = "glyphStyle";
+    private String backBackButtonIdName = "backBackButton";
+    private String buttonsIdName = "buttonsBlock";
+    private String logoIdName = "logoView";
+    private List<String> btnContent = new LinkedList<String>() {
+        {
+            add("Jednoosobowa");
+            add("Wieloosobowa");
+            add("Tablica Wyników");
+        }
+    };
 
     public Scene SceneSet(int sceneNr, Stage primaryStage) throws IOException {
         Scene tScene = null;
@@ -35,22 +56,20 @@ public class SceneSetter {
                 tScene = menuScene(primaryStage);
                 break;
             default:
-                System.out.println("Brak sceny o danym numerze");
+                System.out.println(sceneMissing);
                 break;
         }
         return tScene;
     }
 
     public Scene settingsScene(Stage primaryStage) throws IOException {
-        Parent template = FXMLLoader.load(getClass().getResource("template.fxml")); //do stałych
-        Pane dragBar = (Pane) template.lookup("#dragBar"); //do stałych
+        Parent template = FXMLLoader.load(getClass().getResource(temFileName));
+        Pane dragBar = (Pane) template.lookup(dragIdName);
         defFunctions(primaryStage, true, template);
-        Pane backBtn = new Pane();
-        backBtn.setPrefHeight(30);
-        backBtn.setPrefWidth(45);
-        backBtn.setCursor(Cursor.HAND);
 
-        backBtn.setOnMouseEntered(event1 -> backBtn.setBackground(new Background(new BackgroundFill(Color.web("#00000040"), CornerRadii.EMPTY, Insets.EMPTY)))); //do stałych
+        Pane backBtn = new Pane();
+        backBtn.getStyleClass().add(backButtonClassName);
+        backBtn.setOnMouseEntered(event1 -> backBtn.setBackground(new Background(new BackgroundFill(Color.web(hoverBtnColor), CornerRadii.EMPTY, Insets.EMPTY)))); //do stałych
         backBtn.setOnMouseExited(event1 -> backBtn.setBackground(Background.EMPTY));
         backBtn.setOnMouseClicked(event -> {
             try {
@@ -61,13 +80,11 @@ public class SceneSetter {
         });
 
         Glyph backArrow = new Glyph();
-        backArrow.setFontFamily("FontAwesome"); //do stałych
-        backArrow.setIcon("long_arrow_left"); //do stałych
-        backArrow.setColor(Color.WHITE);
+        backArrow.getStyleClass().add(glyphStyleClassName);
+        backArrow.setIcon(backIcon);
 
         BorderPane borderPane = new BorderPane();
-        borderPane.setPrefHeight(30);
-        borderPane.setPrefWidth(45);
+        borderPane.setId(backBackButtonIdName);
         borderPane.setCenter(backArrow);
 
         backBtn.getChildren().add(borderPane);
@@ -77,16 +94,16 @@ public class SceneSetter {
     }
 
     public void defFunctions(Stage primaryStage, boolean setting, Parent template){
-        Pane closeBtn = (Pane) template.lookup("#closeWin");
-        Pane minWin = (Pane) template.lookup("#minWin");
-        Pane settWin = (Pane) template.lookup("#settWin");
-        Pane dBar = (Pane) template.lookup("#dragBar");
+        Pane closeBtn = (Pane) template.lookup(closeIdName);
+        Pane minWin = (Pane) template.lookup(minIdName);
+        Pane settWin = (Pane) template.lookup(settIdName);
+        Pane dBar = (Pane) template.lookup(dragIdName);
 
         closeBtn.setOnMouseClicked(event -> primaryStage.close());
-        closeBtn.setOnMouseEntered(event -> closeBtn.setBackground(new Background(new BackgroundFill(Color.web("#ff333380"), CornerRadii.EMPTY, Insets.EMPTY))));
+        closeBtn.setOnMouseEntered(event -> closeBtn.setBackground(new Background(new BackgroundFill(Color.web(hoverCloseBtnColor), CornerRadii.EMPTY, Insets.EMPTY))));
         closeBtn.setOnMouseExited(event -> closeBtn.setBackground(Background.EMPTY));
 
-        minWin.setOnMouseEntered(event -> minWin.setBackground(new Background(new BackgroundFill(Color.web("#00000040"), CornerRadii.EMPTY, Insets.EMPTY))));
+        minWin.setOnMouseEntered(event -> minWin.setBackground(new Background(new BackgroundFill(Color.web(hoverBtnColor), CornerRadii.EMPTY, Insets.EMPTY))));
         minWin.setOnMouseClicked(event -> {
             minWin.setBackground(Background.EMPTY);
             AnimationTimer timer = new AnimationTimer() {
@@ -113,7 +130,7 @@ public class SceneSetter {
             primaryStage.setY(event.getScreenY() - yOffset);
         });
 
-        settWin.setOnMouseEntered(event -> settWin.setBackground(new Background(new BackgroundFill(Color.web("#00000040"), CornerRadii.EMPTY, Insets.EMPTY))));
+        settWin.setOnMouseEntered(event -> settWin.setBackground(new Background(new BackgroundFill(Color.web(hoverBtnColor), CornerRadii.EMPTY, Insets.EMPTY))));
         settWin.setOnMouseExited(event -> settWin.setBackground(Background.EMPTY));
         if(!setting){
             settWin.setOnMouseClicked(event -> {
@@ -127,45 +144,38 @@ public class SceneSetter {
     }
 
     public Scene menuScene(Stage primaryStage)  throws IOException {
-        Parent template = FXMLLoader.load(getClass().getResource("template.fxml"));
-        GridPane gridPane = (GridPane) template.lookup("#root");
+        Parent template = FXMLLoader.load(getClass().getResource(temFileName));
+        GridPane gridPane = (GridPane) template.lookup(rootIdName);
         defFunctions(primaryStage, false, template);
         ImageView logo = new ImageView();
-        logo.setImage(new Image("resources/logoIn.png"));
+        logo.setId(logoIdName);
         logo.setFitWidth(415);
         logo.setFitHeight(190);
         logo.setPickOnBounds(true);
         logo.setPreserveRatio(true);
 
         VBox options = new VBox();
-        options.setSpacing(5);
-        options.setPrefHeight(200);
-        options.setPrefWidth(100);
+        options.setId(buttonsIdName);
 
         Map<String, Integer> buttonMap = new LinkedHashMap<>();
-        buttonMap.put("Jednoosobowa", 2);
-        buttonMap.put("Wieloosobowa", 3);
-        buttonMap.put("Tablica Wyników", 4);
+        for(String s:btnContent){
+            buttonMap.put(s, btnContent.indexOf(s)+2);
+        }
 
         for (Map.Entry<String, Integer> btn : buttonMap.entrySet()){
 
             BorderPane butt = new BorderPane();
-            butt.setPrefWidth(90);
-            butt.setPrefHeight(45);
-            butt.getStyleClass().add("menuBtn");
+            butt.getStyleClass().add(buttonClassName);
 
             Text txt = new Text();
             txt.setText(btn.getKey());
-            txt.setFill(Color.web("#f1f1f1"));
-
+            txt.setFill(Color.web(textColor));
             butt.setCenter(txt);
             options.getChildren().add(butt);
 
-            butt.setOnMouseEntered(event -> butt.setBackground(new Background(new BackgroundFill(Color.web("#00000060"), CornerRadii.EMPTY, Insets.EMPTY))));
-            butt.setOnMouseExited(event -> butt.setBackground(new Background(new BackgroundFill(Color.web("#00000040"), CornerRadii.EMPTY, Insets.EMPTY))));
-            butt.setOnMouseClicked(event -> {
-                System.out.println("Brak sceny o danym numerze");
-            });
+            butt.setOnMouseEntered(event -> butt.setBackground(new Background(new BackgroundFill(Color.web(hoverReturnBtnColor), CornerRadii.EMPTY, Insets.EMPTY))));
+            butt.setOnMouseExited(event -> butt.setBackground(new Background(new BackgroundFill(Color.web(hoverBtnColor), CornerRadii.EMPTY, Insets.EMPTY))));
+            butt.setOnMouseClicked(event -> System.out.println(sceneMissing + btn.getValue()));
 
         }
 
