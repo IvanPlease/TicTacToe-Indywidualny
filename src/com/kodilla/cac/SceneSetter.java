@@ -1,5 +1,6 @@
 package com.kodilla.cac;
 
+import com.opencsv.CSVWriter;
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -15,7 +16,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.controlsfx.glyphfont.Glyph;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class SceneSetter {
@@ -50,6 +51,7 @@ public class SceneSetter {
     private final String exitPaneClass = "bigBlack";
     private final String gameBoardId = "gameBoard";
     private final String insideBoardId = "insidePane";
+    private final String inPaneId = "inPane";
     private final String gPaneId = "GPane";
     private final String usernamePrompt = "Podaj nazwę użytkownika";
     private final String textAskClass = "textAsk";
@@ -96,6 +98,9 @@ public class SceneSetter {
             case 2:
                 tScene = askScene(primaryStage);
                 break;
+            case 4:
+                tScene = scoreScene(primaryStage);
+                break;
             default:
                 System.out.println(sceneMissing);
                 break;
@@ -114,13 +119,13 @@ public class SceneSetter {
         Parent template = FXMLLoader.load(getClass().getResource(temFileName));
         Pane whole = (Pane) template.lookup(rootIdName);
         defFunctions(primaryStage, template, true);
+
+        GameRulesAi gameRules = new GameRulesAi(difficulty, icon);
         Pane backBtn = (Pane) template.lookup(backIdName);
         backBtn.setOnMouseClicked(event -> {
             backBtn.setOnMouseClicked(null);
-            exitMsg(primaryStage, template, whole);
+            exitMsg(primaryStage, template, whole, gameRules, nickname);
         });
-
-        GameRulesAi gameRules = new GameRulesAi(difficulty, icon);
         BorderPane gameBoard = new BorderPane();
         gameBoard.setId(gameBoardId);
         gameBoard.setLayoutY(layYVal);
@@ -238,9 +243,10 @@ public class SceneSetter {
                         System.out.println("Winner");
                         Text t = (Text) template.lookup("#"+gameRules.getIcon());
                         t.setText(gameRules.getIcon() + ": " + gameRules.getScoreU());
-                        nextGameMsg(primaryStage, template, whole, gameRules);
+                        nextGameMsg(primaryStage, template, whole, gameRules, nickname);
                     }else if(result == 3){
-                        System.out.println("Draw");
+                        System.out.println("Draw1");
+                        nextGameMsg(primaryStage, template, whole, gameRules, nickname);
                     }else if(result != 2){
                         int re;
                         do{
@@ -252,9 +258,10 @@ public class SceneSetter {
                         if(re == 1){
                             Text t = (Text) template.lookup("#"+gameRules.getIconAi());
                             t.setText(gameRules.getIconAi() + ": " + gameRules.getScoreAI());
-                            nextGameMsg(primaryStage, template, whole, gameRules);
+                            nextGameMsg(primaryStage, template, whole, gameRules, nickname);
                         }else if(re == 3){
-                            System.out.println("Draw");
+                            System.out.println("Draw1");
+                            nextGameMsg(primaryStage, template, whole, gameRules, nickname);
                         }
                     }
                 });
@@ -281,8 +288,11 @@ public class SceneSetter {
 
         Pane backBtn = (Pane) template.lookup(backIdName);
         backBtn.setOnMouseClicked(event -> {
-            backBtn.setOnMouseClicked(null);
-            exitMsg(primaryStage, template, whole);
+            try {
+                primaryStage.setScene(this.SceneSet(1, primaryStage));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
 
         GridPane gameBoard = new GridPane();
@@ -481,7 +491,77 @@ public class SceneSetter {
         return new Scene(template, 750, 500);
     }
 
-    public void exitMsg(Stage primaryStage, Parent template, Pane whole){
+    public Scene scoreScene(Stage primaryStage)  throws IOException {
+        Parent template = FXMLLoader.load(getClass().getResource(temFileName));
+        Pane whole = (Pane) template.lookup(rootIdName);
+        GridPane gridPane = new GridPane();
+        gridPane.setId(gameBoardId);
+        gridPane.setLayoutY(layYVal);
+        gridPane.setAlignment(Pos.CENTER);
+
+        Map<String, String> table = new HashMap<>();
+
+        BufferedReader br = new BufferedReader(new FileReader("abc.csv"));
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] score = line.split(",");
+            table.put(score[0], score[1]);
+        }
+        String[] arrayKeys = table.keySet().toArray( new String[ table.size() ] );
+
+        table.remove(table.get(arrayKeys[ arrayKeys.length - 1 ]) );
+
+        GridPane insidePane = new GridPane();
+        insidePane.setId(inPaneId);
+        insidePane.setAlignment(Pos.CENTER);
+
+        GridPane tableScore = new GridPane();
+        tableScore.prefWidth(250);
+        int mapIterator = 0;
+
+        for(Map.Entry<String, String> sc : table.entrySet()){
+            Pane t = new Pane();
+            t.prefWidth(125);
+
+            Text te = new Text();
+            te.setWrappingWidth(125);
+            te.setText(sc.getKey().substring(1,sc.getKey().length()-1));
+            te.getStyleClass().add("nicknameClass");
+            te.setFill(Color.web("#f1f1f1"));
+
+            Pane t1 = new Pane();
+            t1.prefWidth(125);
+
+            Text te1 = new Text();
+            te1.setWrappingWidth(125);
+            te1.setText(sc.getValue().substring(1,sc.getValue().length()-1));
+            te1.getStyleClass().add("nicknameClass");
+            te1.setFill(Color.web("#f1f1f1"));
+
+            t.getChildren().add(te);
+            t1.getChildren().add(te1);
+            tableScore.add(t, 0,mapIterator);
+            tableScore.add(t1, 1,mapIterator);
+            mapIterator++;
+        }
+        insidePane.add(tableScore,0,0);
+        gridPane.add(insidePane,0,0);
+        defFunctions(primaryStage, template, true);
+
+        Pane backBtn = (Pane) template.lookup(backIdName);
+        backBtn.setOnMouseClicked(event -> {
+            try {
+                primaryStage.setScene(this.SceneSet(1, primaryStage));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        whole.getChildren().add(gridPane);
+
+        return new Scene(template, 750, 500);
+    }
+
+    public void exitMsg(Stage primaryStage, Parent template, Pane whole, GameRulesAi gameRules, String nickname){
         BorderPane overPane = new BorderPane();
         overPane.getStyleClass().add(exitPaneClass);
         overPane.setId(exitBtnId);
@@ -514,13 +594,7 @@ public class SceneSetter {
             hBox.getChildren().add(borderPane1);
             switch (r){
                 case yesBtn:
-                    borderPane1.setOnMouseClicked(event -> {
-                        try {
-                            primaryStage.setScene(this.SceneSet(1, primaryStage));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+                    borderPane1.setOnMouseClicked(event -> nextGameMsg(primaryStage, template, whole, gameRules, nickname));
                     break;
                 case noBtn:
                     borderPane1.setOnMouseClicked(event -> {
@@ -529,7 +603,7 @@ public class SceneSetter {
                         Pane b = (Pane) template.lookup(backIdName);
                         b.setOnMouseClicked(event1 -> {
                             b.setOnMouseClicked(null);
-                            this.exitMsg(primaryStage, template, whole);
+                            this.exitMsg(primaryStage, template, whole, gameRules, nickname);
                         });
                     });
             }
@@ -542,7 +616,7 @@ public class SceneSetter {
         whole.getChildren().add(overPane);
     }
 
-    public void nextGameMsg(Stage primaryStage, Parent template, Pane whole, GameRulesAi gameRules){
+    public void nextGameMsg(Stage primaryStage, Parent template, Pane whole, GameRulesAi gameRules, String nickname){
         BorderPane overPane = new BorderPane();
         overPane.getStyleClass().add(exitPaneClass);
         overPane.setId(exitBtnId);
@@ -630,9 +704,10 @@ public class SceneSetter {
                                         System.out.println("Winner");
                                         Text t = (Text) template.lookup("#"+gameRules.getIcon());
                                         t.setText(gameRules.getIcon() + ": " + gameRules.getScoreU());
-                                        nextGameMsg(primaryStage, template, whole, gameRules);
+                                        nextGameMsg(primaryStage, template, whole, gameRules, nickname);
                                     }else if(result == 3){
                                         System.out.println("Draw");
+                                        nextGameMsg(primaryStage, template, whole, gameRules, nickname);
                                     }else if(result != 2){
                                         int re;
                                         do{
@@ -644,9 +719,10 @@ public class SceneSetter {
                                         if(re == 1){
                                             Text t = (Text) template.lookup("#"+gameRules.getIconAi());
                                             t.setText(gameRules.getIconAi() + ": " + gameRules.getScoreAI());
-                                            nextGameMsg(primaryStage, template, whole, gameRules);
+                                            nextGameMsg(primaryStage, template, whole, gameRules, nickname);
                                         }else if(re == 3){
                                             System.out.println("Draw");
+                                            nextGameMsg(primaryStage, template, whole, gameRules, nickname);
                                         }
                                     }
                                 });
@@ -656,13 +732,20 @@ public class SceneSetter {
                     break;
                 case noBtn:
                     borderPane1.setOnMouseClicked(event -> {
-                        BorderPane borderPane2 = (BorderPane) template.lookup(exitBtnIdName);
-                        whole.getChildren().remove(borderPane2);
-                        Pane b = (Pane) template.lookup(backIdName);
-                        b.setOnMouseClicked(event1 -> {
-                            b.setOnMouseClicked(null);
-                            this.exitMsg(primaryStage, template, whole);
-                        });
+                        try {
+                            BorderPane borderPane2 = (BorderPane) template.lookup(exitBtnIdName);
+                            whole.getChildren().remove(borderPane2);
+                            FileWriter outputFile = new FileWriter("abc.csv", true);
+
+                            CSVWriter writer = new CSVWriter(outputFile);
+                            String[] data2 = { nickname, String.valueOf(gameRules.getScoreU())};
+                            writer.writeNext(data2);
+
+                            writer.close();
+                            primaryStage.setScene(this.SceneSet(1, primaryStage));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     });
             }
         }
