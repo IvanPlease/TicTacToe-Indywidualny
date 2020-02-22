@@ -189,3 +189,9 @@
     -fx-pref-height: 360;
     -fx-pref-width: 360;
 }
+.nicknameClass{
+    -fx-text-alignment: center;
+    -fx-font-family: 'Sriracha';
+    -fx-text-fill: #f1f1f1;
+    -fx-font-size: 15;
+}

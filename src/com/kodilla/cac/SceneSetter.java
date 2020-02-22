@@ -125,8 +125,66 @@ public class SceneSetter {
         gameBoard.setId(gameBoardId);
         gameBoard.setLayoutY(layYVal);
 
-        Pane leftP = new Pane();
+        GridPane leftP = new GridPane();
         leftP.getStyleClass().add(leftBarClass);
+        leftP.setVgap(5);
+        leftP.setStyle("-fx-padding: 10 0 0 0");
+
+        BorderPane namePane = new BorderPane();
+        namePane.setPrefWidth(150);
+
+        Text nickname2 = new Text();
+        nickname2.getStyleClass().add("nicknameClass");
+        nickname2.setWrappingWidth(140);
+        nickname2.setFill(Color.web(textColor));
+        nickname2.setText("Nazwa uzytkownika: " + nickname);
+
+        BorderPane activeSymbol = new BorderPane();
+        activeSymbol.setPrefWidth(150);
+
+        Text stateIcon = new Text();
+        stateIcon.getStyleClass().add("nicknameClass");
+        stateIcon.setWrappingWidth(140);
+        stateIcon.setFill(Color.web(textColor));
+        stateIcon.setText("Aktywny symbol: " + gameRules.getIcon());
+
+        BorderPane stateText = new BorderPane();
+        stateText.setPrefWidth(150);
+
+        Text stateTextTxt = new Text();
+        stateTextTxt.getStyleClass().add("nicknameClass");
+        stateTextTxt.setWrappingWidth(140);
+        stateTextTxt.setFill(Color.web(textColor));
+        stateTextTxt.setText("Stan Gry:");
+
+        GridPane gameState = new GridPane();
+        gameState.setPrefWidth(150);
+
+        Text gameStateOne = new Text();
+        gameStateOne.setId(String.valueOf(gameRules.getIcon()));
+        gameStateOne.getStyleClass().add("nicknameClass");
+        gameStateOne.setWrappingWidth(75);
+        gameStateOne.setFill(Color.web(textColor));
+        gameStateOne.setText(gameRules.getIcon() + ": " + gameRules.getScoreU());
+
+
+        Text gameStateTwo = new Text();
+        gameStateTwo.setId(String.valueOf(gameRules.getIconAi()));
+        gameStateTwo.getStyleClass().add("nicknameClass");
+        gameStateTwo.setWrappingWidth(75);
+        gameStateTwo.setFill(Color.web(textColor));
+        gameStateTwo.setText(gameRules.getIconAi() + ": " + gameRules.getScoreAI());
+
+
+        namePane.setCenter(nickname2);
+        activeSymbol.setCenter(stateIcon);
+        stateText.setCenter(stateTextTxt);
+        gameState.add(gameStateOne, 0,0);
+        gameState.add(gameStateTwo, 1,0);
+        leftP.add(namePane, 0,0);
+        leftP.add(activeSymbol,0,1);
+        leftP.add(stateText,0,2);
+        leftP.add(gameState,0,3);
 
         GridPane gPane = new GridPane();
         gPane.setId(gPaneId);
@@ -178,6 +236,9 @@ public class SceneSetter {
                     int result = gameRules.makeMove(row, col, gameRules.getIcon(), gPane);
                     if(result == 1){
                         System.out.println("Winner");
+                        Text t = (Text) template.lookup("#"+gameRules.getIcon());
+                        t.setText(gameRules.getIcon() + ": " + gameRules.getScoreU());
+                        nextGameMsg(primaryStage, template, whole, gameRules);
                     }else if(result == 3){
                         System.out.println("Draw");
                     }else if(result != 2){
@@ -189,7 +250,9 @@ public class SceneSetter {
                             }
                         }while(re == 2);
                         if(re == 1){
-                            System.out.println("Winner AI");
+                            Text t = (Text) template.lookup("#"+gameRules.getIconAi());
+                            t.setText(gameRules.getIconAi() + ": " + gameRules.getScoreAI());
+                            nextGameMsg(primaryStage, template, whole, gameRules);
                         }else if(re == 3){
                             System.out.println("Draw");
                         }
@@ -456,6 +519,138 @@ public class SceneSetter {
                             primaryStage.setScene(this.SceneSet(1, primaryStage));
                         } catch (IOException e) {
                             e.printStackTrace();
+                        }
+                    });
+                    break;
+                case noBtn:
+                    borderPane1.setOnMouseClicked(event -> {
+                        BorderPane borderPane2 = (BorderPane) template.lookup(exitBtnIdName);
+                        whole.getChildren().remove(borderPane2);
+                        Pane b = (Pane) template.lookup(backIdName);
+                        b.setOnMouseClicked(event1 -> {
+                            b.setOnMouseClicked(null);
+                            this.exitMsg(primaryStage, template, whole);
+                        });
+                    });
+            }
+        }
+
+        gridPane.add(borderPane, 0,0);
+        gridPane.add(hBox, 0,1);
+
+        overPane.setCenter(gridPane);
+        whole.getChildren().add(overPane);
+    }
+
+    public void nextGameMsg(Stage primaryStage, Parent template, Pane whole, GameRulesAi gameRules){
+        BorderPane overPane = new BorderPane();
+        overPane.getStyleClass().add(exitPaneClass);
+        overPane.setId(exitBtnId);
+        overPane.setLayoutY(layYVal);
+
+        GridPane gridPane = new GridPane();
+        gridPane.getStyleClass().add(gridPaneClass);
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setVgap(VGapV);
+
+        BorderPane borderPane = new BorderPane();
+
+        Text text = new Text();
+        text.setText("Chcesz rozpocząć nową rozgrywke?");
+        text.getStyleClass().add(textFontClass);
+
+        borderPane.setCenter(text);
+
+        HBox hBox = new HBox();
+        String[] s = {
+                yesBtn, noBtn
+        };
+        for(String r: s){
+            BorderPane borderPane1 = new BorderPane();
+            borderPane1.getStyleClass().add(bacKBtnClass);
+            Text text1 = new Text();
+            text1.setText(r);
+            text.getStyleClass().add(textFontClass);
+            borderPane1.setCenter(text1);
+            hBox.getChildren().add(borderPane1);
+            switch (r){
+                case yesBtn:
+                    borderPane1.setOnMouseClicked(event -> {
+
+                        BorderPane borderPane2 = (BorderPane) template.lookup(exitBtnIdName);
+                        whole.getChildren().remove(borderPane2);
+                        GridPane gPane = (GridPane) template.lookup("#"+gPaneId);
+                        gPane.getChildren().clear();
+
+                        int[][] squares = {
+                                {6,3,8},
+                                {2,0,4},
+                                {5,1,7}
+                        };
+
+                        for(int s1 = 0;s1<squares.length;s1++){
+                            for(int p = 0;p<squares[s1].length;p++){
+                                Pane square = new Pane();
+                                square.getStyleClass().add(tttPaneClass);
+                                switch (squares[s1][p]){
+                                    case 0:
+                                        square.getStyleClass().add(borderNClass);
+                                        break;
+                                    case 1:
+                                        square.getStyleClass().add(borderTClass);
+                                        break;
+                                    case 2:
+                                        square.getStyleClass().add(borderRClass);
+                                        break;
+                                    case 3:
+                                        square.getStyleClass().add(borderBClass);
+                                        break;
+                                    case 4:
+                                        square.getStyleClass().add(borderLClass);
+                                        break;
+                                    case 5:
+                                        square.getStyleClass().add(borderRTClass);
+                                        break;
+                                    case 6:
+                                        square.getStyleClass().add(borderRBClass);
+                                        break;
+                                    case 7:
+                                        square.getStyleClass().add(borderLTClass);
+                                        break;
+                                    case 8:
+                                        square.getStyleClass().add(borderLBClass);
+                                        break;
+                                }
+                                gPane.add(square, p, s1);
+                                int row = s1;
+                                int col = p;
+                                square.setOnMouseClicked(event1 -> {
+                                    int result = gameRules.makeMove(row, col, gameRules.getIcon(), gPane);
+                                    if(result == 1){
+                                        System.out.println("Winner");
+                                        Text t = (Text) template.lookup("#"+gameRules.getIcon());
+                                        t.setText(gameRules.getIcon() + ": " + gameRules.getScoreU());
+                                        nextGameMsg(primaryStage, template, whole, gameRules);
+                                    }else if(result == 3){
+                                        System.out.println("Draw");
+                                    }else if(result != 2){
+                                        int re;
+                                        do{
+                                            re = gameRules.makeMove(gPane);
+                                            if(re == 3){
+                                                break;
+                                            }
+                                        }while(re == 2);
+                                        if(re == 1){
+                                            Text t = (Text) template.lookup("#"+gameRules.getIconAi());
+                                            t.setText(gameRules.getIconAi() + ": " + gameRules.getScoreAI());
+                                            nextGameMsg(primaryStage, template, whole, gameRules);
+                                        }else if(re == 3){
+                                            System.out.println("Draw");
+                                        }
+                                    }
+                                });
+                            }
                         }
                     });
                     break;
