@@ -32,6 +32,7 @@ public class SceneSetter {
     private double yOffset = 0;
     private int layYVal = 30;
     private final int VGapV = 10;
+    private int paneWidth = 360;
     private final String temFileName = "template.fxml";
     private final String dragIdName = "#dragBar";
     private final String backIcon = "long_arrow_left";
@@ -57,6 +58,7 @@ public class SceneSetter {
     private final String textAskClass = "textAsk";
     private final String tAskClass = "tAsk";
     private final String nicknameId = "nickName";
+    private final String sizeId = "size";
     private final String diffPrompt = "Wybierz poziom trudności";
     private final String startPrompt = "Rozpocznij grę";
     private final String nextBtnId = "nextBtn";
@@ -108,7 +110,7 @@ public class SceneSetter {
         return tScene;
     }
 
-    public Scene gameScene(Stage primaryStage, String nickname, String difficulty) throws IOException {
+    public Scene gameScene(Stage primaryStage, String nickname, String difficulty, int n) throws IOException {
         int tot = randomGen(1,2);
         GameRulesAi.State icon;
         if(tot == 1){
@@ -120,7 +122,7 @@ public class SceneSetter {
         Pane whole = (Pane) template.lookup(rootIdName);
         defFunctions(primaryStage, template, true);
 
-        GameRulesAi gameRules = new GameRulesAi(difficulty, icon);
+        GameRulesAi gameRules = new GameRulesAi(difficulty, icon, n);
         Pane backBtn = (Pane) template.lookup(backIdName);
         backBtn.setOnMouseClicked(event -> {
             backBtn.setOnMouseClicked(null);
@@ -195,78 +197,7 @@ public class SceneSetter {
         gPane.setId(gPaneId);
         gPane.setAlignment(Pos.CENTER);
 
-        int[][] squares = {
-            {6,3,8},
-            {2,0,4},
-            {5,1,7}
-        };
-
-        for(int s = 0;s<squares.length;s++){
-            for(int p = 0;p<squares[s].length;p++){
-                Pane square = new Pane();
-                square.getStyleClass().add(tttPaneClass);
-                switch (squares[s][p]){
-                    case 0:
-                        square.getStyleClass().add(borderNClass);
-                        break;
-                    case 1:
-                        square.getStyleClass().add(borderTClass);
-                        break;
-                    case 2:
-                        square.getStyleClass().add(borderRClass);
-                        break;
-                    case 3:
-                        square.getStyleClass().add(borderBClass);
-                        break;
-                    case 4:
-                        square.getStyleClass().add(borderLClass);
-                        break;
-                    case 5:
-                        square.getStyleClass().add(borderRTClass);
-                        break;
-                    case 6:
-                        square.getStyleClass().add(borderRBClass);
-                        break;
-                    case 7:
-                        square.getStyleClass().add(borderLTClass);
-                        break;
-                    case 8:
-                        square.getStyleClass().add(borderLBClass);
-                        break;
-                }
-                gPane.add(square, p, s);
-                int row = s;
-                int col = p;
-                square.setOnMouseClicked(event -> {
-                    int result = gameRules.makeMove(row, col, gameRules.getIcon(), gPane);
-                    if(result == 1){
-                        System.out.println("Winner");
-                        Text t = (Text) template.lookup("#"+gameRules.getIcon());
-                        t.setText(gameRules.getIcon() + ": " + gameRules.getScoreU());
-                        nextGameMsg(primaryStage, template, whole, gameRules, nickname);
-                    }else if(result == 3){
-                        System.out.println("Draw1");
-                        nextGameMsg(primaryStage, template, whole, gameRules, nickname);
-                    }else if(result != 2){
-                        int re;
-                        do{
-                            re = gameRules.makeMove(gPane);
-                            if(re == 3){
-                                break;
-                            }
-                        }while(re == 2);
-                        if(re == 1){
-                            Text t = (Text) template.lookup("#"+gameRules.getIconAi());
-                            t.setText(gameRules.getIconAi() + ": " + gameRules.getScoreAI());
-                            nextGameMsg(primaryStage, template, whole, gameRules, nickname);
-                        }else if(re == 3){
-                            System.out.println("Draw1");
-                            nextGameMsg(primaryStage, template, whole, gameRules, nickname);
-                        }
-                    }
-                });
-            }
-        }
+        createBoard(paneWidth, n, gPane, primaryStage, template, whole, gameRules, nickname);
 
         Pane rightBar = new Pane();
         rightBar.getStyleClass().add(rightBarClass);
@@ -317,6 +248,20 @@ public class SceneSetter {
         textField.setId(nicknameId);
         textField.getStyleClass().add(textAskClass);
 
+        BorderPane size = new BorderPane();
+        size.getStyleClass().add(textAskClass);
+
+        Text sizeText = new Text();
+        sizeText.setText("Podaj rozmiar tablicy (Max: 7)");
+        sizeText.setFill(Color.web(textColor));
+
+        size.setCenter(sizeText);
+
+        TextField textField2 = new TextField();
+        textField2.setId(sizeId);
+        textField2.getStyleClass().add(textAskClass);
+        textField2.setText("3");
+
         BorderPane difT = new BorderPane();
         difT.getStyleClass().add(textAskClass);
 
@@ -329,7 +274,7 @@ public class SceneSetter {
         HBox buttons = new HBox();
         buttons.getStyleClass().add(textAskClass);
 
-        Map<String, String> radioButtons = new HashMap<>();
+        Map<String, String> radioButtons = new LinkedHashMap<>();
         radioButtons.put("E", "0");
         radioButtons.put("M", "1");
         radioButtons.put("H", "2");
@@ -366,9 +311,10 @@ public class SceneSetter {
         nextBtn.setOnMouseClicked(event -> {
             String nic = textField.getText();
             String diff = (String) difficulty.getSelectedToggle().getUserData();
-            if(nic != null && !nic.isEmpty()){
+            String n = textField2.getText();
+            if(nic != null && !nic.isEmpty() && n != null && !n.isEmpty() &&  Integer.parseInt(n) > 0 && Integer.parseInt(n) < 8){
                 try {
-                    primaryStage.setScene(this.gameScene(primaryStage, nic, diff));
+                    primaryStage.setScene(this.gameScene(primaryStage, nic, diff, Integer.parseInt(n)));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -377,9 +323,11 @@ public class SceneSetter {
 
         insidePane.add(name,0,0);
         insidePane.add(textField,0,1);
-        insidePane.add(difT,0,2);
-        insidePane.add(buttons,0,3);
-        insidePane.add(nextBtn,0,4);
+        insidePane.add(size,0,2);
+        insidePane.add(textField2,0,3);
+        insidePane.add(difT,0,4);
+        insidePane.add(buttons,0,5);
+        insidePane.add(nextBtn,0,6);
 
         gameBoard.getChildren().add(insidePane);
 
@@ -594,7 +542,13 @@ public class SceneSetter {
             hBox.getChildren().add(borderPane1);
             switch (r){
                 case yesBtn:
-                    borderPane1.setOnMouseClicked(event -> nextGameMsg(primaryStage, template, whole, gameRules, nickname));
+                    borderPane1.setOnMouseClicked(event -> {
+                        try {
+                            primaryStage.setScene(this.SceneSet(1, primaryStage));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
                     break;
                 case noBtn:
                     borderPane1.setOnMouseClicked(event -> {
@@ -616,7 +570,7 @@ public class SceneSetter {
         whole.getChildren().add(overPane);
     }
 
-    public void nextGameMsg(Stage primaryStage, Parent template, Pane whole, GameRulesAi gameRules, String nickname){
+    public void nextGameMsg(Stage primaryStage, Parent template, Pane whole, GameRulesAi gameRules, String nickname, int n){
         BorderPane overPane = new BorderPane();
         overPane.getStyleClass().add(exitPaneClass);
         overPane.setId(exitBtnId);
@@ -653,81 +607,10 @@ public class SceneSetter {
 
                         BorderPane borderPane2 = (BorderPane) template.lookup(exitBtnIdName);
                         whole.getChildren().remove(borderPane2);
-                        GridPane gPane = (GridPane) template.lookup("#"+gPaneId);
+                        GridPane gPane = (GridPane) template.lookup("#" + gPaneId);
                         gPane.getChildren().clear();
 
-                        int[][] squares = {
-                                {6,3,8},
-                                {2,0,4},
-                                {5,1,7}
-                        };
-
-                        for(int s1 = 0;s1<squares.length;s1++){
-                            for(int p = 0;p<squares[s1].length;p++){
-                                Pane square = new Pane();
-                                square.getStyleClass().add(tttPaneClass);
-                                switch (squares[s1][p]){
-                                    case 0:
-                                        square.getStyleClass().add(borderNClass);
-                                        break;
-                                    case 1:
-                                        square.getStyleClass().add(borderTClass);
-                                        break;
-                                    case 2:
-                                        square.getStyleClass().add(borderRClass);
-                                        break;
-                                    case 3:
-                                        square.getStyleClass().add(borderBClass);
-                                        break;
-                                    case 4:
-                                        square.getStyleClass().add(borderLClass);
-                                        break;
-                                    case 5:
-                                        square.getStyleClass().add(borderRTClass);
-                                        break;
-                                    case 6:
-                                        square.getStyleClass().add(borderRBClass);
-                                        break;
-                                    case 7:
-                                        square.getStyleClass().add(borderLTClass);
-                                        break;
-                                    case 8:
-                                        square.getStyleClass().add(borderLBClass);
-                                        break;
-                                }
-                                gPane.add(square, p, s1);
-                                int row = s1;
-                                int col = p;
-                                square.setOnMouseClicked(event1 -> {
-                                    int result = gameRules.makeMove(row, col, gameRules.getIcon(), gPane);
-                                    if(result == 1){
-                                        System.out.println("Winner");
-                                        Text t = (Text) template.lookup("#"+gameRules.getIcon());
-                                        t.setText(gameRules.getIcon() + ": " + gameRules.getScoreU());
-                                        nextGameMsg(primaryStage, template, whole, gameRules, nickname);
-                                    }else if(result == 3){
-                                        System.out.println("Draw");
-                                        nextGameMsg(primaryStage, template, whole, gameRules, nickname);
-                                    }else if(result != 2){
-                                        int re;
-                                        do{
-                                            re = gameRules.makeMove(gPane);
-                                            if(re == 3){
-                                                break;
-                                            }
-                                        }while(re == 2);
-                                        if(re == 1){
-                                            Text t = (Text) template.lookup("#"+gameRules.getIconAi());
-                                            t.setText(gameRules.getIconAi() + ": " + gameRules.getScoreAI());
-                                            nextGameMsg(primaryStage, template, whole, gameRules, nickname);
-                                        }else if(re == 3){
-                                            System.out.println("Draw");
-                                            nextGameMsg(primaryStage, template, whole, gameRules, nickname);
-                                        }
-                                    }
-                                });
-                            }
-                        }
+                        createBoard(paneWidth, n, gPane, primaryStage, template, whole, gameRules, nickname);
                     });
                     break;
                 case noBtn:
@@ -735,8 +618,8 @@ public class SceneSetter {
                         try {
                             BorderPane borderPane2 = (BorderPane) template.lookup(exitBtnIdName);
                             whole.getChildren().remove(borderPane2);
-                            FileWriter outputFile = new FileWriter("abc.csv", true);
 
+                            FileWriter outputFile = new FileWriter("abc.csv", true);
                             CSVWriter writer = new CSVWriter(outputFile);
                             String[] data2 = { nickname, String.valueOf(gameRules.getScoreU())};
                             writer.writeNext(data2);
@@ -747,6 +630,7 @@ public class SceneSetter {
                             e.printStackTrace();
                         }
                     });
+                    break;
             }
         }
 
@@ -756,4 +640,109 @@ public class SceneSetter {
         overPane.setCenter(gridPane);
         whole.getChildren().add(overPane);
     }
+
+    public void createBoard(int paneWidth, int n, GridPane gPane, Stage primaryStage, Parent template, Pane whole, GameRulesAi gameRules, String nickname){
+
+        int[][] squares = new int[n][n];
+
+        squares[0][n-1] = 8;
+        squares[n-1][0] = 5;
+        squares[n-1][n-1] = 7;
+
+        for(int s = 0;s<n;s++){
+            for(int p = 0;p<n;p++){
+                if(s==0){
+                    if( p!=n-1){
+                        squares[s][p] = 6;
+                    }else{
+                        squares[s][p] = 3;
+                    }
+                }else if(s==n-1){
+                    if(p!=n-1){
+                        squares[s][p] = 2;
+                    }else{
+                        squares[s][p] = 0;
+                    }
+                }else{
+                    if(p!=n-1){
+                        squares[s][p] = 6;
+                    }else{
+                        squares[s][p] = 3;
+                    }
+                }
+            }
+        }
+
+        int wither = paneWidth / n;
+
+        for(int s = 0;s<n;s++){
+            for(int p = 0;p<n;p++){
+                Pane square = new Pane();
+                square.getStyleClass().add(tttPaneClass);
+                square.setPrefWidth(wither);
+                square.setPrefHeight(wither);
+                switch (squares[s][p]){
+                    case 0:
+                        square.getStyleClass().add(borderNClass);
+                        break;
+                    case 1:
+                        square.getStyleClass().add(borderTClass);
+                        break;
+                    case 2:
+                        square.getStyleClass().add(borderRClass);
+                        break;
+                    case 3:
+                        square.getStyleClass().add(borderBClass);
+                        break;
+                    case 4:
+                        square.getStyleClass().add(borderLClass);
+                        break;
+                    case 5:
+                        square.getStyleClass().add(borderRTClass);
+                        break;
+                    case 6:
+                        square.getStyleClass().add(borderRBClass);
+                        break;
+                    case 7:
+                        square.getStyleClass().add(borderLTClass);
+                        break;
+                    case 8:
+                        square.getStyleClass().add(borderLBClass);
+                        break;
+                }
+                gPane.add(square, p, s);
+                int row = s;
+                int col = p;
+                square.setOnMouseClicked(event -> {
+                    int result = gameRules.makeMove(row, col, gameRules.getIcon(), gPane);
+                    if(result == 1){
+                        System.out.println("Winner");
+                        Text t = (Text) template.lookup("#"+gameRules.getIcon());
+                        t.setText(gameRules.getIcon() + ": " + gameRules.getScoreU());
+                        nextGameMsg(primaryStage, template, whole, gameRules, nickname, n);
+                    }else if(result == 3){
+                        System.out.println("Draw1");
+                        nextGameMsg(primaryStage, template, whole, gameRules, nickname, n);
+                    }else if(result != 2){
+                        int re;
+                        do{
+                            re = gameRules.makeMove(gPane);
+                            if(re == 3){
+                                break;
+                            }
+                        }while(re == 2);
+                        if(re == 1){
+                            Text t = (Text) template.lookup("#"+gameRules.getIconAi());
+                            t.setText(gameRules.getIconAi() + ": " + gameRules.getScoreAI());
+                            nextGameMsg(primaryStage, template, whole, gameRules, nickname, n);
+                        }else if(re == 3){
+                            System.out.println("Draw1");
+                            nextGameMsg(primaryStage, template, whole, gameRules, nickname, n);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
 }
