@@ -17,7 +17,11 @@ import javafx.stage.Stage;
 import org.controlsfx.glyphfont.Glyph;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class SceneSetter {
 
@@ -61,6 +65,7 @@ public class SceneSetter {
     private final String sizeId = "size";
     private final String diffPrompt = "Wybierz poziom trudności";
     private final String startPrompt = "Rozpocznij grę";
+    private final String startMPrompt = "Wyszukaj rozgrywki";
     private final String nextBtnId = "nextBtn";
     private final String closeIdName = "#closeWin";
     private final String minIdName = "#minWin";
@@ -99,6 +104,9 @@ public class SceneSetter {
                 break;
             case 2:
                 tScene = askScene(primaryStage);
+                break;
+            case 3:
+                tScene = multiScene(primaryStage);
                 break;
             case 4:
                 tScene = scoreScene(primaryStage);
@@ -334,6 +342,150 @@ public class SceneSetter {
         whole.getChildren().add(gameBoard);
 
         return new Scene(template, 750, 500);
+    }
+
+    public Scene multiScene(Stage primaryStage) throws IOException {
+        Parent template = FXMLLoader.load(getClass().getResource(temFileName));
+        Pane whole = (Pane) template.lookup(rootIdName);
+        defFunctions(primaryStage, template, true);
+
+        Pane backBtn = (Pane) template.lookup(backIdName);
+        backBtn.setOnMouseClicked(event -> {
+            try {
+                primaryStage.setScene(this.SceneSet(1, primaryStage));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
+        GridPane gameBoard = new GridPane();
+        gameBoard.setId(gameBoardId);
+        gameBoard.setAlignment(Pos.CENTER);
+        gameBoard.setLayoutY(layYVal);
+
+        GridPane insidePane = new GridPane();
+        insidePane.setId(insideBoardId);
+        insidePane.setAlignment(Pos.CENTER);
+
+        BorderPane name = new BorderPane();
+        name.getStyleClass().add(textAskClass);
+
+        Text nameText = new Text();
+        nameText.setText(usernamePrompt);
+        nameText.setFill(Color.web(textColor));
+
+        name.setCenter(nameText);
+
+        TextField textField = new TextField();
+        textField.setId(nicknameId);
+        textField.getStyleClass().add(textAskClass);
+
+        BorderPane size = new BorderPane();
+        size.getStyleClass().add(textAskClass);
+
+        BorderPane nextBtn = new BorderPane();
+        nextBtn.setId(nextBtnId);
+        nextBtn.getStyleClass().add(textAskClass);
+
+        BorderPane tAsk = new BorderPane();
+        tAsk.getStyleClass().add(tAskClass);
+
+        Text start = new Text();
+        start.setText(startMPrompt);
+        start.setFill(Color.web(textColor));
+
+        tAsk.setCenter(start);
+        nextBtn.setCenter(tAsk);
+
+        nextBtn.setOnMouseClicked(event -> {
+            String nic = textField.getText();
+            if(nic != null && !nic.isEmpty()){
+                try {
+                    DatabaseConnector dbConnector = new DatabaseConnector();
+                    dbConnector.insertToDatabase("insert into `userQueue`(`username`) values ('"+nic+"')");
+                    int userId = 0;
+                    dbConnector.selectFromDatabase("select `id` from `userQueue` where `username`='"+nic+"'", userId);
+                    int rowCount = dbConnector.selectFromDatabase("select count(*) from `userQueue`");
+                    int gameCount = dbConnector.selectFromDatabase("select count(*) from `gameStatus`");
+                    if(rowCount%2==0){
+                        int gameId = rowCount/2;
+                        if(gameId > gameCount){
+                            int[] uName = new int[2];
+                            dbConnector.selectFromDatabase("select * from `userQueue` order by id desc limit 2;", uName);
+                            for(int s:uName){
+                                dbConnector.updateRowInDatabase("update `userQueue` set `gameId`="+gameId+" where `id`="+s);
+                            }
+                            dbConnector.insertToDatabase("insert into `gameStatus`(`user1`, `user2`) values ('"+uName[0]+"','"+uName[1]+"')");
+                        }
+                    }
+                    ExecutorService executorService = Executors.newCachedThreadPool();
+                    Runnable runnable = () -> {
+                        try {
+                            boolean res = dbConnector.selectFromDatabaseForResult("select count(*) from `userQueue` where `id`=" + userId + " AND `gameId` is not null");
+                            if (res) {
+                                System.out.println("Game ready");
+                                executorService.shutdownNow();
+                            } else {
+                                System.out.println("Game not ready!");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    };
+                    while(!executorService.isTerminated()) {
+                        executorService.submit(runnable);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        insidePane.add(name,0,0);
+        insidePane.add(textField,0,1);
+        insidePane.add(size,0,2);
+        insidePane.add(nextBtn,0,3);
+
+        gameBoard.getChildren().add(insidePane);
+
+        whole.getChildren().add(gameBoard);
+
+        return new Scene(template, 750, 500);
+    }
+
+
+
+    public Scene gameScene(Stage primaryStage, int gameId, String nickname) throws IOException {
+        int tot = randomGen(1,2);
+        GameRulesAi.State icon;
+        if(tot == 1){
+            icon = GameRulesAi.State.X;
+        }else{
+            icon = GameRulesAi.State.O;
+        }
+        Parent template = FXMLLoader.load(getClass().getResource(temFileName));
+        Pane whole = (Pane) template.lookup(rootIdName);
+        defFunctions(primaryStage, template, true);
+        Pane backBtn = (Pane) template.lookup(backIdName);
+        backBtn.setOnMouseClicked(event -> backBtn.setOnMouseClicked(null));
+        BorderPane gameBoard = new BorderPane();
+        gameBoard.setId(gameBoardId);
+        gameBoard.setLayoutY(layYVal);
+
+        GridPane gPane = new GridPane();
+        gPane.setId(gPaneId);
+        gPane.setAlignment(Pos.CENTER);
+
+
+        Pane rightBar = new Pane();
+        rightBar.getStyleClass().add(rightBarClass);
+        gameBoard.setCenter(gPane);
+        gameBoard.setRight(rightBar);
+
+        whole.getChildren().add(gameBoard);
+
+        return new Scene(template, 750, 500);
+
     }
 
     public void defFunctions(Stage primaryStage, Parent template, boolean back){
@@ -738,6 +890,104 @@ public class SceneSetter {
                         }else if(re == 3){
                             System.out.println("Draw1");
                             nextGameMsg(primaryStage, template, whole, gameRules, nickname, n);
+                        }
+                    }
+                });
+            }
+        }
+    }public void createBoard(int paneWidth, int n, GridPane gPane, Parent template, GameRulesAi gameRules){
+
+        int[][] squares = new int[n][n];
+
+        squares[0][n-1] = 8;
+        squares[n-1][0] = 5;
+        squares[n-1][n-1] = 7;
+
+        for(int s = 0;s<n;s++){
+            for(int p = 0;p<n;p++){
+                if(s==0){
+                    if( p!=n-1){
+                        squares[s][p] = 6;
+                    }else{
+                        squares[s][p] = 3;
+                    }
+                }else if(s==n-1){
+                    if(p!=n-1){
+                        squares[s][p] = 2;
+                    }else{
+                        squares[s][p] = 0;
+                    }
+                }else{
+                    if(p!=n-1){
+                        squares[s][p] = 6;
+                    }else{
+                        squares[s][p] = 3;
+                    }
+                }
+            }
+        }
+
+        int wither = paneWidth / n;
+
+        for(int s = 0;s<n;s++){
+            for(int p = 0;p<n;p++){
+                Pane square = new Pane();
+                square.getStyleClass().add(tttPaneClass);
+                square.setPrefWidth(wither);
+                square.setPrefHeight(wither);
+                switch (squares[s][p]){
+                    case 0:
+                        square.getStyleClass().add(borderNClass);
+                        break;
+                    case 1:
+                        square.getStyleClass().add(borderTClass);
+                        break;
+                    case 2:
+                        square.getStyleClass().add(borderRClass);
+                        break;
+                    case 3:
+                        square.getStyleClass().add(borderBClass);
+                        break;
+                    case 4:
+                        square.getStyleClass().add(borderLClass);
+                        break;
+                    case 5:
+                        square.getStyleClass().add(borderRTClass);
+                        break;
+                    case 6:
+                        square.getStyleClass().add(borderRBClass);
+                        break;
+                    case 7:
+                        square.getStyleClass().add(borderLTClass);
+                        break;
+                    case 8:
+                        square.getStyleClass().add(borderLBClass);
+                        break;
+                }
+                gPane.add(square, p, s);
+                int row = s;
+                int col = p;
+                square.setOnMouseClicked(event -> {
+                    int result = gameRules.makeMove(row, col, gameRules.getIcon(), gPane);
+                    if(result == 1){
+                        System.out.println("Winner");
+                        Text t = (Text) template.lookup("#"+gameRules.getIcon());
+                        t.setText(gameRules.getIcon() + ": " + gameRules.getScoreU());
+                    }else if(result == 3){
+                        System.out.println("Draw1");
+                    }else if(result != 2){
+                        int re;
+                        do{
+                            re = gameRules.makeMove(gPane);
+                            if(re == 3){
+                                break;
+                            }
+                        }while(re == 2);
+                        if(re == 1){
+                            Text t = (Text) template.lookup("#"+gameRules.getIconAi());
+                            t.setText(gameRules.getIconAi() + ": " + gameRules.getScoreAI());
+                        }else if(re == 3){
+                            System.out.println("Draw1");
                         }
                     }
                 });
