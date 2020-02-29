@@ -10,5 +10,6 @@
     <orderEntry type="library" name="org.controlsfx:controlsfx:8.40.14" level="project" />
     <orderEntry type="library" name="com.opencsv:opencsv:5.1" level="project" />
     <orderEntry type="library" name="mysql-connector-java-8.0.19" level="project" />
+    <orderEntry type="library" name="com.victorlaerte:jfx-asynctask:1.0.1" level="project" />
   </component>
 </module>

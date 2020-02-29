@@ -40,8 +40,9 @@ public class DatabaseConnector {
         ResultSet rs = stmt.executeQuery(sqlQuery);
         boolean res = false;
         if(rs.next()){
-            res = rs.getInt(1) == 0;
-            System.out.println(rs.getInt(1));
+            if(rs.getInt(1) == 1){
+                res = true;
+            }
         }
         con.close();
         return res;
@@ -59,14 +60,16 @@ public class DatabaseConnector {
         con.close();
     }
 
-    public void selectFromDatabase(String sqlQuery, int users) throws Exception{
+    public int selectIDFromDatabase(String sqlQuery) throws Exception{
         Connection con = DriverManager.getConnection(mysqlURL,user,password);
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(sqlQuery);
+        int users = 0;
         if(rs.next()){
             users = rs.getInt(1);
         }
         con.close();
+        return users;
     }
 }
 

@@ -1,7 +1,7 @@
 package com.kodilla.cac;
 
 import com.opencsv.CSVWriter;
-import javafx.animation.AnimationTimer;
+import javafx.animation.*;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
@@ -13,15 +13,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.controlsfx.glyphfont.Glyph;
 
 import java.io.*;
-import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class SceneSetter {
 
@@ -403,8 +401,7 @@ public class SceneSetter {
                 try {
                     DatabaseConnector dbConnector = new DatabaseConnector();
                     dbConnector.insertToDatabase("insert into `userQueue`(`username`) values ('"+nic+"')");
-                    int userId = 0;
-                    dbConnector.selectFromDatabase("select `id` from `userQueue` where `username`='"+nic+"'", userId);
+                    int userId = dbConnector.selectIDFromDatabase("select `id` from `userQueue` where `username`='"+nic+"'");
                     int rowCount = dbConnector.selectFromDatabase("select count(*) from `userQueue`");
                     int gameCount = dbConnector.selectFromDatabase("select count(*) from `gameStatus`");
                     if(rowCount%2==0){
@@ -418,23 +415,26 @@ public class SceneSetter {
                             dbConnector.insertToDatabase("insert into `gameStatus`(`user1`, `user2`) values ('"+uName[0]+"','"+uName[1]+"')");
                         }
                     }
-                    ExecutorService executorService = Executors.newCachedThreadPool();
                     Runnable runnable = () -> {
-                        try {
-                            boolean res = dbConnector.selectFromDatabaseForResult("select count(*) from `userQueue` where `id`=" + userId + " AND `gameId` is not null");
-                            if (res) {
-                                System.out.println("Game ready");
-                                executorService.shutdownNow();
-                            } else {
-                                System.out.println("Game not ready!");
+                        boolean end = false;
+                        while(!end){
+                            try {
+                                boolean res = dbConnector.selectFromDatabaseForResult("select count(*) from `userQueue` where `id`=" + userId + " AND `gameId` is not null");
+                                if (res) {
+                                    System.out.println("Game ready");
+                                    end = true;
+                                } else {
+                                    System.out.println("Game not ready!");
+                                }
+                                Thread.sleep(1000);
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
                     };
-                    while(!executorService.isTerminated()) {
-                        executorService.submit(runnable);
-                    }
+                    Thread t = new Thread(runnable);
+                    t.start();
+                    t.run();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

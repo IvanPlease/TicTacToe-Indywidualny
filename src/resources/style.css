@@ -147,6 +147,12 @@
     -fx-font-family: 'Sriracha';
     -fx-font-size: 15;
 }
+.textAskB{
+    -fx-pref-width: 140;
+    -fx-min-width: 140;
+    -fx-font-family: 'Sriracha';
+    -fx-font-size: 15;
+}
 .textAsk>BorderPane>RadioButton{
     -fx-text-alignment: center;
     -fx-text-fill: #f1f1f1;
