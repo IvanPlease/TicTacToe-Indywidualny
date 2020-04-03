@@ -3,14 +3,9 @@
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.glyphfont.*?>
 
-<Pane id="wholeWin" maxHeight="1000" maxWidth="1500" minHeight="250" minWidth="375" prefHeight="500" prefWidth="750" stylesheets="@../../../resources/style.css" xmlns="http://javafx.com/javafx/10.0.2-internal">
+<Pane id="wholeWin" maxHeight="1000" maxWidth="1500" minHeight="250" minWidth="375" prefHeight="500" prefWidth="750" stylesheets="@../../../resources/style.css" xmlns="http://javafx.com/javafx/10.0.2-internal" >
     <Pane id="dragBar" prefHeight="30" prefWidth="750">
-        <HBox layoutX="615" prefHeight="30" prefWidth="135">
-            <BorderPane id="settWin" prefHeight="30" prefWidth="45">
-                <center>
-                    <Glyph fontFamily="FontAwesome" icon="cog" textFill="white" />
-                </center>
-            </BorderPane>
+        <HBox layoutX="660" prefHeight="30" prefWidth="90">
             <BorderPane id="minWin" prefHeight="30" prefWidth="45">
                 <center>
                     <Glyph fontFamily="FontAwesome" icon="minus" textFill="white" />

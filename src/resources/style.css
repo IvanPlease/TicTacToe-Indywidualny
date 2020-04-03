@@ -20,17 +20,27 @@
     -fx-background-size: stretch;
     -fx-background-position: center center;
     -fx-padding: 10 0 0 0;
-    -fx-alignment: top-center;
+    -fx-alignment: center;
     -fx-pref-height: 470;
     -fx-pref-width: 750;
     -fx-vgap: 10;
+}
+#insidePane{
+    -fx-alignment: center;
+    -fx-vgap: 10;
+    -fx-padding: 10;
+    -fx-background-color: rgba(0,0,0,0.4);
+}
+#inPane{
+    -fx-alignment: center;
+    -fx-background-color: rgba(0,0,0,0.4);
 }
 #dragBar{
     -fx-background-color: #3e3e3e;
     -fx-pref-height: 30;
     -fx-pref-width: 750;
 }
-#closeWin, #minWin, #settWin, #backBtn, .menuBtn{
+#closeWin, #minWin, #settWin, .backBtn, .menuBtn{
     -fx-cursor: hand;
 }
 #menuTabs{
@@ -40,10 +50,9 @@
 .backBtn{
     -fx-pref-height: 30;
     -fx-pref-width: 45;
-    -fx-cursor: hand;
 }
 .glyphStyle{
-    -fx-font-family: "FontAwesome";
+    -fx-font-family: "FontAwesome" !important;
     -fx-text-fill: #fff;
 }
 #backBackButton{
@@ -66,6 +75,12 @@
     -fx-pref-width: 90;
     -fx-pref-height: 45;
 }
+.menuBtn:hover,#minWin:hover, #settWin:hover, .backBtn:hover{
+    -fx-background-color: #00000040;
+}
+#closeWin:hover{
+    -fx-background-color: #ff333380;
+}
 .taskBtn{
     -fx-pref-height: 30;
     -fx-pref-width: 45;
@@ -75,13 +90,8 @@
     -fx-pref-height: 30;
 }
 .tttPane{
-    -fx-pref-height: 140;
-    -fx-pref-width: 140;
     -fx-border-color: #ae9b95;
     -fx-cursor: hand;
-}
-.tttPane:hover{
-    -fx-background-color: rgba(0,0,0,.2);
 }
 .border-right-bottom{
     -fx-border-width: 0 2 2 0;
@@ -115,4 +125,69 @@
     -fx-pref-width: 150;
     -fx-background-color: rgba(0,0,0,0.2);
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,.2), 1, 10.0, 1, 0)
+}
+.rightBar{
+    -fx-pref-height: 470;
+    -fx-pref-width: 100;
+}
+.gamePane{
+    -fx-cursor: hand;
+}
+.gameGlyph{
+    -fx-font-family: "FontAwesome" !important;
+    -fx-text-fill: #ae9b95;
+}
+.textAsk{
+    -fx-pref-width: 180;
+    -fx-min-width: 180;
+    -fx-font-family: 'Sriracha';
+
+}
+.textAsk>BorderPane>RadioButton{
+    -fx-text-alignment: center;
+    -fx-text-fill: #f1f1f1;
+    -fx-cursor: hand;
+}
+.textAsk>BorderPane{
+    -fx-pref-width: 60;
+}
+#nextBtn{
+    -fx-background-color: rgba(106, 138, 53, 0.5);
+    -fx-cursor: hand;
+}
+#nextBtn:hover{
+    -fx-background-color: rgba(106, 138, 53, 0.75);
+}
+.bigBlack{
+    -fx-pref-width: 750;
+    -fx-pref-height: 470;
+    -fx-background-color: rgba(0,0,0,0.5);
+}
+.miaWin{
+    -fx-pref-width: 250;
+    -fx-pref-height: 100;
+    -fx-max-width: 250;
+    -fx-max-height: 100;
+    -fx-background-color: #f1f1f1;
+}
+.btnExit{
+    -fx-pref-width: 125;
+    -fx-cursor: hand;
+}
+.font{
+    -fx-font-family: 'Sriracha';
+}
+.tAsk{
+    -fx-pref-width: 100;
+    -fx-pref-height: 40;
+}
+#GPane{
+    -fx-min-height: 360;
+    -fx-pref-width: 360;
+}
+.nicknameClass{
+    -fx-text-alignment: center;
+    -fx-font-family: 'Sriracha';
+    -fx-text-fill: #f1f1f1;
+    -fx-font-size: 15;
 }
