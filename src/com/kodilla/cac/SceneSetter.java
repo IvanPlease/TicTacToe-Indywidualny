@@ -79,11 +79,11 @@ public class SceneSetter {
     private final String exitBtnIdName = "#exitBtn";
     private final String gridPaneClass = "miaWin";
     private final String endGame = "Czy na pewno chcesz zakonczyc gre?";
-    private final String textFontClass = "font";
-    private final String bacKBtnClass = "btnExit";
-    private final String yesBtn = "Tak";
-    private final String noBtn = "Nie";
-    private final List<String> btnContent = new LinkedList<String>() {
+    private static final String textFontClass = "font";
+    private static final String bacKBtnClass = "btnExit";
+    private static final String yesBtn = "Tak";
+    private static final String noBtn = "Nie";
+    private static final List<String> btnContent = new LinkedList<String>() {
         {
             add("Jednoosobowa");
             add("Tablica Wyników");
@@ -660,7 +660,7 @@ public class SceneSetter {
         whole.getChildren().add(overPane);
     }
 
-    public void nextGameMsg(Stage primaryStage, Parent template, Pane whole, GameRulesAi gameRules, String nickname){
+    public void nextGameMsg(Stage primaryStage, Parent template, Pane whole, GameRulesAi gameRules, String nickname, int n){
         BorderPane overPane = new BorderPane();
         overPane.getStyleClass().add(exitPaneClass);
         overPane.setId(exitBtnId);
@@ -700,11 +700,24 @@ public class SceneSetter {
                         GridPane gPane = (GridPane) template.lookup("#"+gPaneId);
                         gPane.getChildren().clear();
 
-                        int[][] squares = {
-                                {6,3,8},
-                                {2,0,4},
-                                {5,1,7}
-                        };
+                        int[][] squares = new int[n][n];
+
+                        for(int i=0;i<n;i++){
+                            for(int j=0;j<n;j++){
+                                if(i==n-1){
+                                    squares[i][j] = 2;
+                                }else if((i!=0 && i!=n-1) && j==n-1){
+                                    squares[i][j] = 3;
+                                }else{
+                                    squares[i][j] = 6;
+                                }
+                            }
+                        }
+
+                        squares[0][0] = 6;
+                        squares[0][n-1] = 3;
+                        squares[n-1][0] = 2;
+                        squares[n-1][n-1] = 0;
 
                         for(int s1 = 0;s1<squares.length;s1++){
                             for(int p = 0;p<squares[s1].length;p++){
@@ -748,10 +761,10 @@ public class SceneSetter {
                                         System.out.println("Winner");
                                         Text t = (Text) template.lookup("#"+gameRules.getIcon());
                                         t.setText(gameRules.getIcon() + ": " + gameRules.getScoreU());
-                                        nextGameMsg(primaryStage, template, whole, gameRules, nickname);
+                                        nextGameMsg(primaryStage, template, whole, gameRules, nickname, n);
                                     }else if(result == 3){
                                         System.out.println("Draw");
-                                        nextGameMsg(primaryStage, template, whole, gameRules, nickname);
+                                        nextGameMsg(primaryStage, template, whole, gameRules, nickname, n);
                                     }else if(result != 2){
                                         int re;
                                         do{
@@ -763,10 +776,10 @@ public class SceneSetter {
                                         if(re == 1){
                                             Text t = (Text) template.lookup("#"+gameRules.getIconAi());
                                             t.setText(gameRules.getIconAi() + ": " + gameRules.getScoreAI());
-                                            nextGameMsg(primaryStage, template, whole, gameRules, nickname);
+                                            nextGameMsg(primaryStage, template, whole, gameRules, nickname, n);
                                         }else if(re == 3){
                                             System.out.println("Draw");
-                                            nextGameMsg(primaryStage, template, whole, gameRules, nickname);
+                                            nextGameMsg(primaryStage, template, whole, gameRules, nickname, n);
                                         }
                                     }
                                 });
